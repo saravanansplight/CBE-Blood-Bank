@@ -1,0 +1,28 @@
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# Build output
+client/dist/
+dist/
+build/
+
+# Environment
+.env
+server/.env
+client/.env
+client/.env.local
+
+# MongoDB memory server cache
+.mongodb-memory-server/
+server/.mongodb-memory-server/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
