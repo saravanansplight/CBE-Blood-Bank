@@ -21,8 +21,10 @@ export async function api(path, { method = 'GET', body, auth = true } = {}) {
   let data = {}
   try { data = await res.json() } catch (_) {}
   if (!res.ok) {
-    const err = new Error(data.message || `Request failed (${res.status})`)
-    err.status = res.status
+    const errorMsg = data.message || (data.error && data.hint ? `${data.error} - ${data.hint}` : data.error) || `Request failed (${res.status})`;
+    const err = new Error(errorMsg);
+    err.status = res.status;
+    err.data = data;
     if (res.status === 401) {
       localStorage.removeItem('cbc_token')
       localStorage.removeItem('cbc_role')

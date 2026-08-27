@@ -9,46 +9,72 @@
 const dns = require('dns');
 const mongoose = require('mongoose');
 
-// Set reliable DNS servers for resolving MongoDB Atlas SRV records (fixes Windows querySrv ECONNREFUSED)
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1']);
-} catch (e) {
-  // Ignore if unable to override in sandboxed environments
+// Set reliable DNS servers for resolving MongoDB Atlas SRV records on Windows local dev ONLY
+// (Never run in Linux / AWS Lambda / Vercel serverless containers as it can break DNS resolution)
+if (process.platform === 'win32' && !process.env.VERCEL && process.env.NODE_ENV !== 'production') {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  } catch (e) {
+    // Ignore if unable to override in sandboxed environments
+  }
 }
 
 let memoryServer = null;
-let cachedConnection = null;
+
+// Global cache for serverless environments (prevents connection leaks & race conditions across invocations)
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 async function connectDB() {
-  // Return cached active connection if available (for serverless environments)
-  if (cachedConnection && mongoose.connection.readyState === 1) {
-    return cachedConnection;
+  // Return cached active connection if available
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
   }
 
-  const uri = process.env.MONGODB_URI && !process.env.MONGODB_URI.includes('<username>')
-    ? process.env.MONGODB_URI
+  // If a connection attempt is already in flight, await it
+  if (cached.promise) {
+    try {
+      cached.conn = await cached.promise;
+      return cached.conn;
+    } catch (e) {
+      cached.promise = null;
+    }
+  }
+
+  const rawUri = process.env.MONGODB_URI;
+  const uri = rawUri && !rawUri.includes('<username>') && !rawUri.includes('<password>')
+    ? rawUri.trim()
     : null;
 
   // Try real Atlas / Mongo connection first
   if (uri) {
     try {
       mongoose.set('strictQuery', true);
-      const conn = await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 6000,
+      cached.promise = mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 10000,
+        maxPoolSize: 10,
+        socketTimeoutMS: 45000,
+      }).then((m) => {
+        console.log(`✅ MongoDB Atlas connected: ${m.connection.host}`);
+        return m;
       });
-      cachedConnection = conn;
-      console.log(`✅ MongoDB Atlas connected: ${conn.connection.host}`);
-      return conn;
+
+      cached.conn = await cached.promise;
+      return cached.conn;
     } catch (err) {
-      console.warn(`⚠️  Could not reach MONGODB_URI (${err.message}).`);
+      cached.promise = null;
+      console.error(`❌ MongoDB Atlas connection error: ${err.message}`);
       if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-        throw new Error(`MongoDB connection failed: ${err.message}. Ensure your MONGODB_URI is correct in Vercel environment variables.`);
+        throw new Error(`MongoDB connection failed: ${err.message}. Please verify your MONGODB_URI in Vercel Project Settings.`);
       }
       console.warn('   Falling back to in-memory MongoDB for local dev...');
     }
   } else {
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-      throw new Error('MONGODB_URI is not configured in Vercel environment variables. Please set MONGODB_URI in your Vercel Project Settings.');
+      throw new Error('MONGODB_URI is not configured in Vercel environment variables. Please add MONGODB_URI to your Vercel Project Settings under Environment Variables.');
     }
     console.log('ℹ️  No MONGODB_URI configured. Using in-memory MongoDB (demo mode).');
     console.log('   Set MONGODB_URI in .env to use MongoDB Atlas.');
@@ -65,11 +91,11 @@ async function connectDB() {
     });
     const memUri = memoryServer.getUri();
     const conn = await mongoose.connect(memUri);
-    cachedConnection = conn;
+    cached.conn = conn;
     console.log(`✅ In-memory MongoDB started (demo mode): ${memUri}`);
     return conn;
   } catch (err) {
-    console.error('Failed to initialize in-memory MongoDB:', err);
+    console.error('Failed to initialize in-memory MongoDB:', err.message);
     throw err;
   }
 }
@@ -81,7 +107,8 @@ async function disconnectDB() {
   if (memoryServer) {
     await memoryServer.stop();
   }
-  cachedConnection = null;
+  cached.conn = null;
+  cached.promise = null;
 }
 
 function getDBStatus() {
@@ -97,3 +124,4 @@ function getDBStatus() {
 }
 
 module.exports = { connectDB, disconnectDB, getDBStatus };
+
