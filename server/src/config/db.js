@@ -80,25 +80,8 @@ async function connectDB() {
     console.log('   Set MONGODB_URI in .env to use MongoDB Atlas.');
   }
 
-  // Fallback: in-memory mongo for local development only
-  try {
-    const mms = 'mongodb-memory-server';
-    const { MongoMemoryServer } = require(mms);
-    const memVersion = process.env.MONGOMS_VERSION || '8.0.8';
-    console.log('   Preparing in-memory MongoDB (downloading/starting)...');
-    memoryServer = await MongoMemoryServer.create({
-      binary: { version: memVersion },
-      instance: { launchTimeout: 300000 },
-    });
-    const memUri = memoryServer.getUri();
-    const conn = await mongoose.connect(memUri);
-    cached.conn = conn;
-    console.log(`✅ In-memory MongoDB started (demo mode): ${memUri}`);
-    return conn;
-  } catch (err) {
-    console.error('Failed to initialize in-memory MongoDB:', err.message);
-    throw err;
-  }
+  // If no URI is provided, and we get here, it means we are in local dev but want to fail loudly.
+  throw new Error("MONGODB_URI is required to run this application. Please set it in your .env file or Vercel Environment Variables.");
 }
 
 async function disconnectDB() {
