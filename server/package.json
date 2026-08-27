@@ -32,10 +32,6 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "mongodb-memory-server": "^9.1.7",
     "nodemon": "^3.1.4"
-  },
-  "allowScripts": {
-    "mongodb-memory-server@9.5.0": true
   }
 }
