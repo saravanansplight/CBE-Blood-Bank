@@ -4,6 +4,7 @@
   "private": true,
   "description": "CBE BloodConnect - Coimbatore Blood Donor & Emergency Blood Request Management System (MCA Mini Project)",
   "scripts": {
+    "preinstall": "rm -rf node_modules server/node_modules client/node_modules",
     "build": "cd client && npm install && npm run build",
     "install:server": "cd server && npm install",
     "install:client": "cd client && npm install",
