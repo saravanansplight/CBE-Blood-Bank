@@ -25,5 +25,9 @@
     "morgan": "^1.10.0"
   },
   "keywords": ["blood-donor", "coimbatore", "react", "nodejs", "express", "mongodb", "mca"],
-  "license": "MIT"
+  "license": "MIT",
+  "allowScripts": {
+    "mongodb-memory-server": true,
+    "esbuild": true
+  }
 }
