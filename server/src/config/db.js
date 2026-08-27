@@ -82,7 +82,8 @@ async function connectDB() {
 
   // Fallback: in-memory mongo for local development only
   try {
-    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mms = 'mongodb-memory-server';
+    const { MongoMemoryServer } = require(mms);
     const memVersion = process.env.MONGOMS_VERSION || '8.0.8';
     console.log('   Preparing in-memory MongoDB (downloading/starting)...');
     memoryServer = await MongoMemoryServer.create({
