@@ -39,7 +39,7 @@ export default function Home() {
                 📊 Dashboard
               </Link>
             ) : (
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="hidden md:flex items-center gap-1 sm:gap-2">
                 <Link to="/login" className="btn btn-outline btn-sm font-semibold">
                   Login
                 </Link>

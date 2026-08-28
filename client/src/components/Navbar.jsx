@@ -60,6 +60,7 @@ export default function Navbar() {
         <Logo to={role ? ({ donor: '/donor/dashboard', requester: '/requester/dashboard', admin: '/admin/dashboard' }[role]) : '/'} />
 
         <nav className="hidden lg:flex items-center gap-1">
+          <Link to="/" className="nav-link">🏠 Home</Link>
           {items.map((i) => (
             <Link key={i.to} to={i.to} className={`nav-link ${location.pathname === i.to ? 'active' : ''}`}>
               {i.icon} <span className="hidden sm:inline">{i.label}</span>
@@ -92,6 +93,9 @@ export default function Navbar() {
       {open && (
         <div className="lg:hidden border-t border-slate-100 bg-white">
           <div className="px-4 py-3 flex flex-col gap-1">
+            <Link to="/" onClick={() => setOpen(false)} className="nav-link">
+              🏠 Home Screen
+            </Link>
             {items.map((i) => (
               <Link key={i.to} to={i.to} onClick={() => setOpen(false)} className={`nav-link ${location.pathname === i.to ? 'active' : ''}`}>
                 {i.icon} {i.label}
