@@ -5,10 +5,6 @@ import react from '@vitejs/plugin-react'
 // so the React SPA can call relative "/api/..." URLs with no CORS issues.
 export default defineConfig({
   plugins: [react()],
-  build: {
-    outDir: '../dist',
-    emptyOutDir: true,
-  },
   server: {
     host: '0.0.0.0',
     port: 5173,
