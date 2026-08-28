@@ -22,10 +22,10 @@ export default function AdminDashboard() {
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         <StatCard label="Total Donors" value={stats.totalDonors} icon="👥" accent="red" to="/admin/donors" />
-        <StatCard label="Available" value={stats.availableDonors} icon="✅" accent="green" to="/admin/donors" />
         <StatCard label="Active Requests" value={stats.totalActiveRequests} icon="🩸" accent="blue" to="/admin/requests" />
-        <StatCard label="Critical" value={stats.criticalRequests} icon="🔴" accent="red" to="/admin/requests" />
-        <StatCard label="Fulfilled" value={stats.fulfilledRequests} icon="🎯" accent="green" to="/admin/requests" />
+        <StatCard label="Normal" value={stats.normalRequests} icon="🟢" accent="green" to="/admin/requests?urgency=Normal" />
+        <StatCard label="Urgent" value={stats.urgentRequests} icon="🟠" accent="amber" to="/admin/requests?urgency=Urgent" />
+        <StatCard label="Critical" value={stats.criticalRequests} icon="🔴" accent="red" to="/admin/requests?urgency=Critical" />
         <StatCard label="Responses" value={stats.totalResponses} icon="🤝" accent="amber" to="/admin/requests" />
       </div>
       <div className="grid lg:grid-cols-3 gap-6">

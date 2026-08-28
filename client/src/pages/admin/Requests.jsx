@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import api from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { PageHeader, Loader, BloodChip, UrgencyBadge, StatusBadge } from '../../components/ui'
@@ -6,6 +7,9 @@ import { formatDate } from '../../utils/helpers'
 
 export default function AdminRequests() {
   const { showToast } = useToast()
+  const [searchParams] = useSearchParams()
+  const filterUrgency = searchParams.get('urgency') // e.g. 'Normal', 'Urgent', 'Critical'
+
   const [data, setData] = useState(null)
   const [detail, setDetail] = useState(null)
   const [error, setError] = useState('')
@@ -23,11 +27,20 @@ export default function AdminRequests() {
   if (error) return <div className="card p-8 text-center text-red-600">{error}</div>
   if (!data) return <Loader />
 
+  const requestsToShow = data.requests.filter((r) => !filterUrgency || r.urgency === filterUrgency)
+
   return (
     <div className="animate-fade-in">
-      <PageHeader title="🩸 Request Management" subtitle="All blood requests with status control." />
+      <PageHeader 
+        title="🩸 Request Management" 
+        subtitle={filterUrgency ? `Showing only ${filterUrgency} requests.` : "All blood requests with status control."}
+      >
+        {filterUrgency && (
+          <Link to="/admin/requests" className="btn btn-outline btn-sm">Clear Filter ✕</Link>
+        )}
+      </PageHeader>
       <div className="space-y-3">
-        {data.requests.map((r) => (
+        {requestsToShow.map((r) => (
           <div key={r._id} className="card p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-wrap">
               <BloodChip group={r.bloodGroup} size="sm" />

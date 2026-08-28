@@ -20,23 +20,24 @@ const { timeAgo } = require('../utils/helpers');
 router.get('/dashboard', auth, authorize('admin'), async (req, res) => {
   try {
     const [
-      totalDonors, availableDonors, totalActiveRequests,
-      criticalRequests, fulfilledRequests, totalResponses,
-      totalRequesters,
+      totalDonors, totalActiveRequests,
+      normalRequests, urgentRequests, criticalRequests,
+      totalResponses, totalRequesters,
     ] = await Promise.all([
       Donor.countDocuments({}),
-      Donor.countDocuments({ isActive: true, availabilityStatus: 'Available' }),
       BloodRequest.countDocuments({ status: { $in: ACTIVE_STATUSES } }),
+      BloodRequest.countDocuments({ status: { $in: ACTIVE_STATUSES }, urgency: 'Normal' }),
+      BloodRequest.countDocuments({ status: { $in: ACTIVE_STATUSES }, urgency: 'Urgent' }),
       BloodRequest.countDocuments({ status: { $in: ACTIVE_STATUSES }, urgency: 'Critical' }),
-      BloodRequest.countDocuments({ status: 'FULFILLED' }),
       DonorMatch.countDocuments({ responseStatus: { $in: ['ACCEPTED', 'REJECTED'] } }),
       Requester.countDocuments({}),
     ]);
 
     return res.json({
       stats: {
-        totalDonors, availableDonors, totalActiveRequests,
-        criticalRequests, fulfilledRequests, totalResponses, totalRequesters,
+        totalDonors, totalActiveRequests,
+        normalRequests, urgentRequests, criticalRequests,
+        totalResponses, totalRequesters,
       },
     });
   } catch (err) {
