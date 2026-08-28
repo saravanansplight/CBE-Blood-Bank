@@ -166,3 +166,101 @@ body { background: var(--bc-bg); color: #1e293b; }
 .tbl tr:hover td { background:#fefefe; }
 
 .divider { height:1px; background:linear-gradient(90deg,transparent,#e2e8f0,transparent); margin:1.25rem 0; }
+
+/* ============================================================
+   CBE BloodConnect - Responsiveness Overrides for Tiny Devices
+   ============================================================ */
+
+/* Standard Mobile & Tablet Adjustments */
+@media (max-width: 640px) {
+  .hero-grid {
+    background-size: 16px 16px, 100% 100% !important;
+  }
+}
+
+/* Phones and Narrow Devices (< 480px) */
+@media (max-width: 480px) {
+  /* Scale down card and form paddings to prevent squeezing text */
+  .p-14, .p-10 { padding: 1.5rem !important; }
+  .p-8, .md\:p-8 { padding: 1.25rem !important; }
+  .p-7 { padding: 1.1rem !important; }
+  .p-6, .md\:p-6 { padding: 1rem !important; }
+  .p-5 { padding: 0.85rem !important; }
+  
+  /* Force grid columns to collapse to a single column on narrow screens */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  
+  /* Allow button text to wrap instead of forcing horizontal overflow */
+  .btn {
+    white-space: normal !important;
+    text-align: center;
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Form elements scaling */
+  .input, .select, .textarea {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.75rem;
+  }
+}
+
+/* Micro Devices & Button Phones (< 360px) */
+@media (max-width: 360px) {
+  /* Hide secondary text details in the header to fit viewports */
+  .logo-text {
+    display: none !important;
+  }
+  .db-badge-text {
+    display: none !important;
+  }
+  
+  /* Maximize space for header icons */
+  .topnav {
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+  .topnav > div {
+    gap: 0.35rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+  
+  /* Shrink drop logo size */
+  .drop-logo {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+  .drop-logo svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  /* Micro card padding */
+  .p-5, .p-6, .card {
+    padding: 0.75rem !important;
+  }
+  
+  /* Keep typography sizes in ratio */
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.4rem !important; }
+  h3 { font-size: 1.15rem !important; }
+  
+  .text-4xl { font-size: 1.75rem !important; }
+  .text-3xl { font-size: 1.4rem !important; }
+  .text-2xl { font-size: 1.2rem !important; }
+  
+  /* Scale down custom blood chips and badges */
+  .bg-chip {
+    min-width: 2.2rem;
+    height: 1.9rem;
+    font-size: 0.85rem;
+  }
+  .badge {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.65rem;
+  }
+}
+

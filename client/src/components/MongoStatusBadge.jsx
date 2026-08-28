@@ -54,7 +54,7 @@ export default function MongoStatusBadge() {
         <span className="hidden sm:inline">
           {isAtlas ? 'MongoDB Atlas' : isMemory ? 'Demo In-Memory' : 'MongoDB Offline'}
         </span>
-        <span className="sm:hidden text-[11px]">
+        <span className="sm:hidden db-badge-text text-[11px]">
           {isAtlas ? 'Atlas' : isMemory ? 'Demo' : 'Offline'}
         </span>
       </button>
