@@ -52,7 +52,9 @@ app.use((req, res, next) => {
 let seedTriggered = false;
 app.use(async (req, res, next) => {
   // Only connect to DB on API requests
-  const isApiReq = req.path.startsWith('/api') || !fs.existsSync(path.join(__dirname, '../../client/dist'));
+  // On Vercel, ALL requests to this function are API requests (static files served separately by CDN)
+  const isVercel = !!process.env.VERCEL;
+  const isApiReq = isVercel || req.path.startsWith('/api') || !fs.existsSync(path.join(__dirname, '../../client/dist'));
   if (isApiReq) {
     try {
       await connectDB();
@@ -105,18 +107,21 @@ app.use('/api', apiRouter);
 app.use('/', apiRouter);
 
 // ----- Static frontend (React build in production / standalone server) -----
-const clientBuild = path.join(__dirname, '../../client/dist');
-if (fs.existsSync(clientBuild)) {
-  app.use(express.static(clientBuild));
-}
+// On Vercel, static files are served by Vercel's CDN from outputDirectory — skip Express static serving
+if (!process.env.VERCEL) {
+  const clientBuild = path.join(__dirname, '../../client/dist');
+  if (fs.existsSync(clientBuild)) {
+    app.use(express.static(clientBuild));
+  }
 
-// ----- SPA fallback: unknown non-API routes -> React index (if built) -----
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api/') || req.path === '/api') return next();
-  const clientIndex = path.join(__dirname, '../../client/dist/index.html');
-  if (fs.existsSync(clientIndex)) return res.sendFile(clientIndex);
-  res.status(404).json({ message: 'Not found. Frontend not built — run the React dev server (client/).' });
-});
+  // ----- SPA fallback: unknown non-API routes -> React index (if built) -----
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path === '/api') return next();
+    const clientIndex = path.join(__dirname, '../../client/dist/index.html');
+    if (fs.existsSync(clientIndex)) return res.sendFile(clientIndex);
+    res.status(404).json({ message: 'Not found. Frontend not built — run the React dev server (client/).' });
+  });
+}
 
 // ----- Error handler -----
 app.use((err, req, res, next) => {
