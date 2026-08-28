@@ -305,7 +305,7 @@ export default function Home() {
           </div>
         </div>
         <div className="border-t border-slate-700 py-5 text-center text-sm text-slate-500">
-          © 2026 CBE BloodConnect • MCA Mini Project • Built with React, Node.js, Express &amp; MongoDB Atlas
+          © 2026 CBE BloodConnect
         </div>
       </footer>
     </div>

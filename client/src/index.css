@@ -213,9 +213,9 @@ body { background: var(--bc-bg); color: #1e293b; }
 
 /* Micro Devices & Button Phones (< 360px) */
 @media (max-width: 360px) {
-  /* Hide secondary text details in the header to fit viewports */
-  .logo-text {
-    display: none !important;
+  /* Scale down header logo text instead of hiding it */
+  .logo-text div:first-child {
+    font-size: 0.8rem !important;
   }
   .db-badge-text {
     display: none !important;
