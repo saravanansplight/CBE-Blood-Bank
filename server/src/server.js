@@ -54,7 +54,7 @@ app.use(async (req, res, next) => {
   // Only connect to DB on API requests
   // On Vercel, ALL requests to this function are API requests (static files served separately by CDN)
   const isVercel = !!process.env.VERCEL;
-  const isApiReq = isVercel || req.path.startsWith('/api') || !fs.existsSync(path.join(__dirname, '../../client/dist'));
+  const isApiReq = isVercel || req.path.startsWith('/api') || (!fs.existsSync(path.join(__dirname, '../../dist')) && !fs.existsSync(path.join(__dirname, '../../client/dist')));
   if (isApiReq) {
     try {
       await connectDB();
@@ -109,15 +109,19 @@ app.use('/', apiRouter);
 // ----- Static frontend (React build in production / standalone server) -----
 // On Vercel, static files are served by Vercel's CDN from outputDirectory — skip Express static serving
 if (!process.env.VERCEL) {
-  const clientBuild = path.join(__dirname, '../../client/dist');
-  if (fs.existsSync(clientBuild)) {
-    app.use(express.static(clientBuild));
+  // Check both possible build output locations (new: ../../dist, legacy: ../../client/dist)
+  const buildDir = fs.existsSync(path.join(__dirname, '../../dist'))
+    ? path.join(__dirname, '../../dist')
+    : path.join(__dirname, '../../client/dist');
+
+  if (fs.existsSync(buildDir)) {
+    app.use(express.static(buildDir));
   }
 
   // ----- SPA fallback: unknown non-API routes -> React index (if built) -----
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api/') || req.path === '/api') return next();
-    const clientIndex = path.join(__dirname, '../../client/dist/index.html');
+    const clientIndex = path.join(buildDir, 'index.html');
     if (fs.existsSync(clientIndex)) return res.sendFile(clientIndex);
     res.status(404).json({ message: 'Not found. Frontend not built — run the React dev server (client/).' });
   });
