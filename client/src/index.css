@@ -11,7 +11,11 @@
   --bc-bg: #f8fafc;
 }
 * { -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-html, body { text-rendering: optimizeLegibility; }
+html, body {
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  max-width: 100%;
+}
 body { background: var(--bc-bg); color: #1e293b; }
 
 /* ---------- Blood drop logo ---------- */

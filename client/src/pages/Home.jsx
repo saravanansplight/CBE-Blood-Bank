@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
 import MongoStatusBadge from '../components/MongoStatusBadge'
@@ -9,7 +9,14 @@ import { BLOOD_GROUPS, LOCATIONS } from '../utils/helpers'
 export default function Home() {
   const { user } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const role = user?.role
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const dashLink = role === 'admin' ? '/admin/dashboard' : role === 'requester' ? '/requester/dashboard' : '/donor/dashboard'
 
@@ -39,14 +46,16 @@ export default function Home() {
                 📊 Dashboard
               </Link>
             ) : (
-              <div className="hidden md:flex items-center gap-1 sm:gap-2">
-                <Link to="/login" className="btn btn-outline btn-sm font-semibold">
-                  Login
-                </Link>
-                <Link to="/donor-register" className="btn btn-primary btn-sm font-semibold hidden sm:inline-flex">
-                  Become a Donor
-                </Link>
-              </div>
+              !isMobile && (
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Link to="/login" className="btn btn-outline btn-sm font-semibold">
+                    Login
+                  </Link>
+                  <Link to="/donor-register" className="btn btn-primary btn-sm font-semibold">
+                    Become a Donor
+                  </Link>
+                </div>
+              )
             )}
 
             {/* Mobile Menu Hamburger */}
