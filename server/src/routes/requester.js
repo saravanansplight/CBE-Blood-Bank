@@ -164,21 +164,30 @@ router.get('/requests', auth, authorize('requester'), async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    const data = requests.map((r) => ({
-      _id: r._id,
-      requestId: r.requestId,
-      bloodGroup: r.bloodGroup,
-      unitsRequired: r.unitsRequired,
-      hospitalName: r.hospitalName,
-      locationName: r.locationName,
-      urgency: r.urgency,
-      status: r.status,
-      requiredDate: r.requiredDate,
-      requiredTime: r.requiredTime,
-      createdAt: r.createdAt,
-      createdAgo: timeAgo(r.createdAt),
-      expiresAt: r.expiresAt,
-    }));
+    const data = await Promise.all(
+      requests.map(async (r) => {
+        const pendingCount = await DonorMatch.countDocuments({
+          bloodRequestId: r._id,
+          responseStatus: 'PENDING',
+        });
+        return {
+          _id: r._id,
+          requestId: r.requestId,
+          bloodGroup: r.bloodGroup,
+          unitsRequired: r.unitsRequired,
+          hospitalName: r.hospitalName,
+          locationName: r.locationName,
+          urgency: r.urgency,
+          status: r.status,
+          requiredDate: r.requiredDate,
+          requiredTime: r.requiredTime,
+          createdAt: r.createdAt,
+          createdAgo: timeAgo(r.createdAt),
+          expiresAt: r.expiresAt,
+          pendingCount,
+        };
+      })
+    );
 
     return res.json({ requests: data });
   } catch (err) {

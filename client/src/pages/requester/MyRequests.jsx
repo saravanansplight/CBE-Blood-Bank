@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import api from '../../api/client'
 import { PageHeader, Loader, EmptyState, BloodChip, UrgencyBadge, StatusBadge } from '../../components/ui'
 
 export default function MyRequests() {
+  const [searchParams] = useSearchParams()
+  const filterType = searchParams.get('filter') // 'pending'
+
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
 
@@ -12,13 +15,26 @@ export default function MyRequests() {
   if (error) return <div className="card p-8 text-center text-red-600">{error}</div>
   if (!data) return <Loader />
 
+  const requestsToShow = data.requests.filter((r) => {
+    if (filterType === 'pending') return r.pendingCount > 0
+    return true
+  })
+
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
-      <PageHeader title="📋 My Blood Requests" subtitle="All requests you have raised.">
-        <Link to="/requester/create-request" className="btn btn-primary">➕ Create Request</Link>
+      <PageHeader 
+        title="📋 My Blood Requests" 
+        subtitle={filterType === 'pending' ? "Showing requests with pending donor responses." : "All requests you have raised."}
+      >
+        <div className="flex gap-2">
+          {filterType === 'pending' && (
+            <Link to="/requester/my-requests" className="btn btn-outline btn-sm">Clear Filter ✕</Link>
+          )}
+          <Link to="/requester/create-request" className="btn btn-primary btn-sm">➕ Create Request</Link>
+        </div>
       </PageHeader>
       <div className="space-y-4">
-        {data.requests.length ? data.requests.map((r) => (
+        {requestsToShow.length ? requestsToShow.map((r) => (
           <Link key={r._id} to={`/requester/request/${r._id}`} className="card card-hover p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <BloodChip group={r.bloodGroup} />

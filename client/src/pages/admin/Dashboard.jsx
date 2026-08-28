@@ -26,7 +26,7 @@ export default function AdminDashboard() {
         <StatCard label="Normal" value={stats.normalRequests} icon="🟢" accent="green" to="/admin/requests?urgency=Normal" />
         <StatCard label="Urgent" value={stats.urgentRequests} icon="🟠" accent="amber" to="/admin/requests?urgency=Urgent" />
         <StatCard label="Critical" value={stats.criticalRequests} icon="🔴" accent="red" to="/admin/requests?urgency=Critical" />
-        <StatCard label="Responses" value={stats.totalResponses} icon="🤝" accent="amber" to="/admin/requests" />
+        <StatCard label="Responses" value={stats.totalResponses} icon="🤝" accent="amber" to="/admin/requests?status=DONOR_RESPONDED" />
       </div>
       <div className="grid lg:grid-cols-3 gap-6">
         <Link to="/admin/donors" className="card card-hover p-6"><div className="text-3xl mb-2">👥</div><h3 className="font-bold text-slate-800">Donor Management</h3><p className="text-sm text-slate-500 mt-1">View, verify, activate or deactivate donors. See name changes instantly.</p></Link>

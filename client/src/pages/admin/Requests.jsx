@@ -9,6 +9,7 @@ export default function AdminRequests() {
   const { showToast } = useToast()
   const [searchParams] = useSearchParams()
   const filterUrgency = searchParams.get('urgency') // e.g. 'Normal', 'Urgent', 'Critical'
+  const filterStatus = searchParams.get('status') // e.g. 'DONOR_RESPONDED'
 
   const [data, setData] = useState(null)
   const [detail, setDetail] = useState(null)
@@ -27,15 +28,25 @@ export default function AdminRequests() {
   if (error) return <div className="card p-8 text-center text-red-600">{error}</div>
   if (!data) return <Loader />
 
-  const requestsToShow = data.requests.filter((r) => !filterUrgency || r.urgency === filterUrgency)
+  const requestsToShow = data.requests.filter((r) => {
+    const matchesUrgency = !filterUrgency || r.urgency === filterUrgency
+    const matchesStatus = !filterStatus || r.status === filterStatus
+    return matchesUrgency && matchesStatus
+  })
+
+  const hasFilter = filterUrgency || filterStatus
 
   return (
     <div className="animate-fade-in">
       <PageHeader 
         title="🩸 Request Management" 
-        subtitle={filterUrgency ? `Showing only ${filterUrgency} requests.` : "All blood requests with status control."}
+        subtitle={
+          hasFilter 
+            ? `Showing only ${filterUrgency || ''} ${filterStatus ? filterStatus.replace(/_/g, ' ') : ''} requests.`
+            : "All blood requests with status control."
+        }
       >
-        {filterUrgency && (
+        {hasFilter && (
           <Link to="/admin/requests" className="btn btn-outline btn-sm">Clear Filter ✕</Link>
         )}
       </PageHeader>

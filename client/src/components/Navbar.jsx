@@ -57,7 +57,7 @@ export default function Navbar() {
   return (
     <header className="topnav sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-        <Logo to={role ? ({ donor: '/donor/dashboard', requester: '/requester/dashboard', admin: '/admin/dashboard' }[role]) : '/'} />
+        <Logo to="/" />
 
         <nav className="hidden lg:flex items-center gap-1">
           <Link to="/" className="nav-link">🏠 Home</Link>
