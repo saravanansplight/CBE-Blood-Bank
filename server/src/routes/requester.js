@@ -37,7 +37,8 @@ router.get('/dashboard', auth, authorize('requester'), async (req, res) => {
       DonorMatch.distinct('bloodRequestId', { bloodRequestId: { $in: myReqIds }, responseStatus: { $ne: 'PENDING' } })
     ]);
 
-    const donorsNotified = notifiedRequestIds.length;
+    const respondedSet = new Set(respondedRequestIds.map((id) => id.toString()));
+    const donorsNotified = notifiedRequestIds.filter((id) => !respondedSet.has(id.toString())).length;
     const donorsResponded = respondedRequestIds.length;
 
     const recent = myRequests

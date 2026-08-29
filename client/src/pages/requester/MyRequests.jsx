@@ -17,7 +17,7 @@ export default function MyRequests() {
 
   const requestsToShow = data.requests.filter((r) => {
     if (filterType === 'pending') return r.pendingCount > 0
-    if (filterType === 'notified') return r.notifiedCount > 0
+    if (filterType === 'notified') return r.notifiedCount > 0 && r.respondedCount === 0
     if (filterType === 'responded') return r.respondedCount > 0
     return true
   })
