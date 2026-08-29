@@ -148,7 +148,7 @@ npm run build:client       # rebuilds client/dist (served by the backend)
 | Role | Username | Password |
 |------|----------|----------|
 | **Admin** | `admin` | `admin123` |
-| **Requester** | `Priya01` | `Priya01` |
+| **Requester** | `priya1` | `priya1` |
 | **Donor (O+)** | `arun.o` | `donor123` |
 | **Donor (A+)** | `arun.a` | `donor123` |
 | **Donor (AB+)** | `prakash.ab` | `donor123` |
