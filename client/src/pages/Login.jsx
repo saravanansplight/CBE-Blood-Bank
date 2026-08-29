@@ -44,9 +44,8 @@ export default function Login() {
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-slate-50 relative">
-        <Link to="/" className="absolute top-6 left-6 flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-red-600 transition-colors z-50">
-          <span className="text-lg">←</span>
-          <span className="hidden sm:inline">Back to home</span>
+        <Link to="/" className="absolute top-6 left-6 flex items-center justify-center w-9 h-9 rounded-full bg-white shadow-sm border border-slate-200 text-slate-500 hover:text-red-600 hover:shadow-md transition-all z-50" aria-label="Back to home">
+          <span className="text-xl leading-none">←</span>
         </Link>
         <div className="w-full max-w-md mt-12 lg:mt-0">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
@@ -76,7 +75,6 @@ export default function Login() {
               <Link to="/donor-register" className="btn btn-outline btn-sm">❤️ New Donor</Link>
               <Link to="/requester-register" className="btn btn-outline btn-sm">🩸 New Requester</Link>
             </div>
-            <Link to="/" className="block text-center text-sm text-slate-500 hover:text-red-600 mt-4">← Back to home</Link>
           </div>
 
           <details className="mt-4 card p-4 text-sm">
