@@ -36,7 +36,7 @@ export default function MyRequests() {
         subtitle={getSubtitle()}
       >
         <div className="flex gap-2">
-          {filterType && (
+          {filterType && filterType !== 'notified' && filterType !== 'responded' && (
             <Link to="/requester/my-requests" className="btn btn-outline btn-sm">Clear Filter ✕</Link>
           )}
           <Link to="/requester/create-request" className="btn btn-primary btn-sm">➕ Create Request</Link>
