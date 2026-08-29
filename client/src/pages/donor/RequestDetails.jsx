@@ -94,14 +94,6 @@ export default function DonorRequestDetails() {
                           <span>📞 Call Requester ({r.requesterMobile})</span>
                         </a>
                       )}
-                      {r.requesterEmail && (
-                        <a
-                          href={`mailto:${r.requesterEmail}`}
-                          className="btn btn-outline btn-sm text-xs"
-                        >
-                          ✉️ Send Email
-                        </a>
-                      )}
                     </div>
                   </div>
                 </div>

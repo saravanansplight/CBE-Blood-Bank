@@ -91,14 +91,6 @@ export default function RequesterRequestDetails() {
                             <span>📞 Call:</span>
                             <span className="font-mono">{res.donorMobile}</span>
                           </a>
-                          {res.donorEmail && (
-                            <a
-                              href={`mailto:${res.donorEmail}`}
-                              className="btn btn-outline btn-sm text-xs px-2.5 py-1.5"
-                            >
-                              ✉️ Email
-                            </a>
-                          )}
                         </div>
                       )}
                     </div>
