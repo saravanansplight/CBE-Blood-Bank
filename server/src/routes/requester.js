@@ -32,14 +32,10 @@ router.get('/dashboard', auth, authorize('requester'), async (req, res) => {
     const totalRequests = myRequests.length;
     const myReqIds = myRequests.map((r) => r._id);
 
-    const donorsNotified = await DonorMatch.countDocuments({
-      bloodRequestId: { $in: myReqIds },
-    });
-
-    const donorsResponded = await DonorMatch.countDocuments({
-      bloodRequestId: { $in: myReqIds },
-      responseStatus: { $ne: 'PENDING' },
-    });
+    const [donorsNotified, donorsResponded] = await Promise.all([
+      DonorMatch.countDocuments({ bloodRequestId: { $in: myReqIds } }),
+      DonorMatch.countDocuments({ bloodRequestId: { $in: myReqIds }, responseStatus: { $ne: 'PENDING' } })
+    ]);
 
     const recent = myRequests
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -157,37 +153,62 @@ router.post('/requests', auth, authorize('requester'), async (req, res) => {
 router.get('/requests', auth, authorize('requester'), async (req, res) => {
   try {
     const requester = await getRequester(req);
+    if (!requester) return res.status(404).json({ message: 'Requester profile not found.' });
+
     const requests = await BloodRequest.find({ requesterId: requester._id })
       .sort({ createdAt: -1 })
       .lean();
 
-    const data = await Promise.all(
-      requests.map(async (r) => {
-        const pendingCount = await DonorMatch.countDocuments({
-          bloodRequestId: r._id,
-          responseStatus: 'PENDING',
-        });
-        return {
-          _id: r._id,
-          requestId: r.requestId,
-          bloodGroup: r.bloodGroup,
-          unitsRequired: r.unitsRequired,
-          hospitalName: r.hospitalName,
-          locationName: r.locationName,
-          urgency: r.urgency,
-          status: r.status,
-          requiredDate: r.requiredDate,
-          requiredTime: r.requiredTime,
-          createdAt: r.createdAt,
-          createdAgo: timeAgo(r.createdAt),
-          expiresAt: r.expiresAt,
-          pendingCount,
-        };
-      })
-    );
+    const myReqIds = requests.map((r) => r._id);
+
+    // Get aggregated stats for pending, notified, and responded counts per request
+    const stats = await DonorMatch.aggregate([
+      { $match: { bloodRequestId: { $in: myReqIds } } },
+      {
+        $group: {
+          _id: '$bloodRequestId',
+          notifiedCount: { $sum: 1 },
+          pendingCount: {
+            $sum: { $cond: [{ $eq: ['$responseStatus', 'PENDING'] }, 1, 0] }
+          },
+          respondedCount: {
+            $sum: { $cond: [{ $ne: ['$responseStatus', 'PENDING'] }, 1, 0] }
+          }
+        }
+      }
+    ]);
+
+    // Map aggregated counts to bloodRequestId
+    const statsMap = stats.reduce((acc, curr) => {
+      acc[curr._id.toString()] = curr;
+      return acc;
+    }, {});
+
+    const data = requests.map((r) => {
+      const matchStats = statsMap[r._id.toString()] || { notifiedCount: 0, pendingCount: 0, respondedCount: 0 };
+      return {
+        _id: r._id,
+        requestId: r.requestId,
+        bloodGroup: r.bloodGroup,
+        unitsRequired: r.unitsRequired,
+        hospitalName: r.hospitalName,
+        locationName: r.locationName,
+        urgency: r.urgency,
+        status: r.status,
+        requiredDate: r.requiredDate,
+        requiredTime: r.requiredTime,
+        createdAt: r.createdAt,
+        createdAgo: timeAgo(r.createdAt),
+        expiresAt: r.expiresAt,
+        pendingCount: matchStats.pendingCount,
+        notifiedCount: matchStats.notifiedCount,
+        respondedCount: matchStats.respondedCount,
+      };
+    });
 
     return res.json({ requests: data });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: 'Something went wrong.' });
   }
 });

@@ -17,17 +17,26 @@ export default function MyRequests() {
 
   const requestsToShow = data.requests.filter((r) => {
     if (filterType === 'pending') return r.pendingCount > 0
+    if (filterType === 'notified') return r.notifiedCount > 0
+    if (filterType === 'responded') return r.respondedCount > 0
     return true
   })
+
+  const getSubtitle = () => {
+    if (filterType === 'pending') return "Showing requests with pending donor responses."
+    if (filterType === 'notified') return "Showing requests with notified donors."
+    if (filterType === 'responded') return "Showing requests with donor responses."
+    return "All requests you have raised."
+  }
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
       <PageHeader 
         title="📋 My Blood Requests" 
-        subtitle={filterType === 'pending' ? "Showing requests with pending donor responses." : "All requests you have raised."}
+        subtitle={getSubtitle()}
       >
         <div className="flex gap-2">
-          {filterType === 'pending' && (
+          {filterType && (
             <Link to="/requester/my-requests" className="btn btn-outline btn-sm">Clear Filter ✕</Link>
           )}
           <Link to="/requester/create-request" className="btn btn-primary btn-sm">➕ Create Request</Link>
