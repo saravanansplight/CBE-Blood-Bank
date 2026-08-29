@@ -43,8 +43,12 @@ export default function Login() {
         <p className="text-red-200 text-sm">© 2026 CBE BloodConnect</p>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-slate-50">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-slate-50 relative">
+        <Link to="/" className="absolute top-6 left-6 flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-red-600 transition-colors z-50">
+          <span className="text-lg">←</span>
+          <span className="hidden sm:inline">Back to home</span>
+        </Link>
+        <div className="w-full max-w-md mt-12 lg:mt-0">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <Logo />
           </div>

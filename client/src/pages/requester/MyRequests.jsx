@@ -44,7 +44,7 @@ export default function MyRequests() {
       </PageHeader>
       <div className="space-y-4">
         {requestsToShow.length ? requestsToShow.map((r) => (
-          <Link key={r._id} to={`/requester/request/${r._id}`} className="card card-hover p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <Link key={r._id} to={`/requester/request/${r._id}`} className="card card-hover p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
             <div className="flex items-center gap-4">
               <BloodChip group={r.bloodGroup} />
               <div>
@@ -53,7 +53,15 @@ export default function MyRequests() {
                 <div className="text-sm text-slate-500">📍 {r.locationName} • {r.unitsRequired}u • {r.createdAgo}</div>
               </div>
             </div>
-            <div className="flex items-center gap-2"><UrgencyBadge u={r.urgency} /><StatusBadge s={r.status} /></div>
+            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+              <div className="flex items-center gap-2">
+                <UrgencyBadge u={r.urgency} />
+                <StatusBadge s={r.status} />
+              </div>
+              <span className="text-xs font-bold text-red-600 hover:text-red-800 transition-colors flex items-center gap-0.5 group-hover:translate-x-1 duration-200">
+                View →
+              </span>
+            </div>
           </Link>
         )) : <EmptyState msg="You have not created any blood requests yet." icon="📋" />}
       </div>
