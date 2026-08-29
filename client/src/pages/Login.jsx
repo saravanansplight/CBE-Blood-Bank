@@ -79,7 +79,7 @@ export default function Login() {
             <summary className="cursor-pointer font-semibold text-slate-600">🔑 Demo login credentials</summary>
             <div className="mt-3 grid gap-2 text-xs">
               <div className="bg-slate-50 rounded px-3 py-2"><b>Admin:</b> admin / admin123</div>
-              <div className="bg-slate-50 rounded px-3 py-2"><b>Requester:</b> requester1 / requester123</div>
+              <div className="bg-slate-50 rounded px-3 py-2"><b>Requester:</b> Priya01 / Priya01</div>
               <div className="bg-slate-50 rounded px-3 py-2"><b>Donor (O+):</b> arun.o / donor123</div>
               <div className="bg-slate-50 rounded px-3 py-2"><b>Donor (A+):</b> arun.a / donor123</div>
             </div>

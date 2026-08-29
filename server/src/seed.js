@@ -148,18 +148,32 @@ async function seedSampleDonors() {
 
 async function seedSampleRequester() {
   try {
-    const existing = await Requester.findOne({ username: 'requester1' });
-    if (existing) { console.log('ℹ️  Sample requester already exists.'); return; }
-    const passwordHash = await bcrypt.hash('requester123', 10);
-    let user = await User.findOne({ username: 'requester1' });
+    // Migrate existing requester1 user to Priya01 if present
+    const req1 = await User.findOne({ username: 'requester1' });
+    if (req1) {
+      req1.username = 'Priya01';
+      req1.passwordHash = await bcrypt.hash('Priya01', 10);
+      await req1.save();
+      
+      await Requester.updateOne(
+        { userId: req1._id },
+        { username: 'Priya01', passwordHash: req1.passwordHash }
+      );
+      console.log('✅ Migrated sample requester from requester1 to Priya01');
+    }
+
+    const existing = await Requester.findOne({ username: 'Priya01' });
+    if (existing) { console.log('ℹ️  Sample requester already exists (Priya01).'); return; }
+    const passwordHash = await bcrypt.hash('Priya01', 10);
+    let user = await User.findOne({ username: 'Priya01' });
     if (!user) {
-      user = await User.create({ username: 'requester1', passwordHash, role: 'requester' });
+      user = await User.create({ username: 'Priya01', passwordHash, role: 'requester' });
     }
     await Requester.create({
-      userId: user._id, fullName: 'Priya Subramanian', username: 'requester1',
-      email: 'requester1@example.com', mobile: '9843099999', passwordHash,
+      userId: user._id, fullName: 'Priya Subramanian', username: 'Priya01',
+      email: 'priya01@example.com', mobile: '9843099999', passwordHash,
     });
-    console.log('✅ Sample requester created → username: requester1');
+    console.log('✅ Sample requester created → username: Priya01');
   } catch (err) {
     console.warn('⚠️ Sample requester seed note:', err.message);
   }
@@ -169,7 +183,7 @@ async function seedSampleRequest() {
   try {
     const reqCount = await BloodRequest.countDocuments({});
     if (reqCount > 0) { console.log('ℹ️  Blood requests already present.'); return; }
-    const requester = await Requester.findOne({ username: 'requester1' });
+    const requester = await Requester.findOne({ username: 'Priya01' });
     if (!requester) return;
     
     const sampleList = [
@@ -203,7 +217,7 @@ async function seedSampleRequest() {
         expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
       });
       await RequestStatusHistory.create({
-        requestId: reqId, status: 'CREATED', note: `Sample request created by ${requester.fullName}.`, changedBy: 'requester1',
+        requestId: reqId, status: 'CREATED', note: `Sample request created by ${requester.fullName}.`, changedBy: 'Priya01',
       });
       await processNewRequest(bloodRequest);
     }

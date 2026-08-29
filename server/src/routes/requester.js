@@ -32,10 +32,13 @@ router.get('/dashboard', auth, authorize('requester'), async (req, res) => {
     const totalRequests = myRequests.length;
     const myReqIds = myRequests.map((r) => r._id);
 
-    const [donorsNotified, donorsResponded] = await Promise.all([
-      DonorMatch.countDocuments({ bloodRequestId: { $in: myReqIds } }),
-      DonorMatch.countDocuments({ bloodRequestId: { $in: myReqIds }, responseStatus: { $ne: 'PENDING' } })
+    const [notifiedRequestIds, respondedRequestIds] = await Promise.all([
+      DonorMatch.distinct('bloodRequestId', { bloodRequestId: { $in: myReqIds } }),
+      DonorMatch.distinct('bloodRequestId', { bloodRequestId: { $in: myReqIds }, responseStatus: { $ne: 'PENDING' } })
     ]);
+
+    const donorsNotified = notifiedRequestIds.length;
+    const donorsResponded = respondedRequestIds.length;
 
     const recent = myRequests
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
