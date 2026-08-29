@@ -29,17 +29,16 @@ router.get('/dashboard', auth, authorize('requester'), async (req, res) => {
     if (!requester) return res.status(404).json({ message: 'Requester profile not found.' });
 
     const myRequests = await BloodRequest.find({ requesterId: requester._id }).lean();
-    const activeCount = myRequests.filter((r) => ACTIVE_STATUSES.includes(r.status)).length;
-    const fulfilledCount = myRequests.filter((r) => r.status === 'FULFILLED').length;
-
+    const totalRequests = myRequests.length;
     const myReqIds = myRequests.map((r) => r._id);
-    const pendingResponses = await DonorMatch.countDocuments({
+
+    const donorsNotified = await DonorMatch.countDocuments({
       bloodRequestId: { $in: myReqIds },
-      responseStatus: 'PENDING',
     });
-    const acceptedResponses = await DonorMatch.countDocuments({
+
+    const donorsResponded = await DonorMatch.countDocuments({
       bloodRequestId: { $in: myReqIds },
-      responseStatus: 'ACCEPTED',
+      responseStatus: { $ne: 'PENDING' },
     });
 
     const recent = myRequests
@@ -63,11 +62,9 @@ router.get('/dashboard', auth, authorize('requester'), async (req, res) => {
         mobile: requester.mobile,
       },
       stats: {
-        totalRequests: myRequests.length,
-        activeRequests: activeCount,
-        pendingResponses,
-        acceptedResponses,
-        fulfilledRequests: fulfilledCount,
+        totalRequests,
+        donorsNotified,
+        donorsResponded,
       },
       recent,
     });

@@ -32,11 +32,10 @@ export default function RequesterDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Active Requests" value={s.activeRequests} icon="🩸" accent="red" to="/requester/my-requests" />
-        <StatCard label="Pending Responses" value={s.pendingResponses} icon="⏳" accent="amber" to="/requester/my-requests?filter=pending" />
-        <StatCard label="Fulfilled Requests" value={s.fulfilledRequests} icon="✅" accent="green" to="/requester/my-requests" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard label="Total Requests" value={s.totalRequests} icon="📋" accent="blue" to="/requester/my-requests" />
+        <StatCard label="Donors Notified" value={s.donorsNotified} icon="📢" accent="amber" to="/requester/my-requests" />
+        <StatCard label="Donors Responded" value={s.donorsResponded} icon="🤝" accent="green" to="/requester/my-requests" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
